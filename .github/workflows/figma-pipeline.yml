@@ -18,8 +18,8 @@ jobs:
 
       - name: Commit changes
         run: |
-          git config user.name crunchbase-ci
-          git config user.email team_infrastructure_service_account@crunchbase.com
+          git config --global user.name "${GITHUB_ACTOR}"
+          git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
           git checkout -b crunchbase-ci/update-figma-variables
           git add .
           git commit -m "CB-00000 Update Figma Variables"
