@@ -16,11 +16,10 @@ jobs:
           configuration: '{ "method": "GET", "headers": {"X-FIGMA-TOKEN": "figd_awj-_-C2suKicYdGLTdj_zcQtDykqa35yqp5pEy7"} }'
           save-name: figma
 
-    
-      - name: Commit changes
-        uses: EndBug/add-and-commit@v9
-        with:
-          new_branch: update-figma-variables
+      # - name: Commit changes
+      #   uses: EndBug/add-and-commit@v9
+      #   with:
+      #     new_branch: update-figma-variables
       #   run: |
       #     git config --global user.name "${{github.actor}}"
       #     git config --global user.email "${{github.actor}}@users.noreply.github.com"
@@ -37,7 +36,7 @@ jobs:
       #     script: |
       #       const script = require('./.github/scripts/create-yarn-lock-pull.js');
       #       await script(github, context, core);
-      - name: Create Pull Request
-        run: gh pr create -B main -H update-figma-variables --title 'Merge branch_to_merge into base_branch' --body 'Created by Github action'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # - name: Create Pull Request
+      #   run: gh pr create -B main -H update-figma-variables --title 'Merge branch_to_merge into base_branch' --body 'Created by Github action'
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
