@@ -11,7 +11,7 @@ jobs:
         uses: JamesIves/fetch-api-data-action@releases/v2
         with:
           endpoint: https://api.figma.com/v1/files/MoOEVw9unAKquzEvS3xmRC/variables/local
-          configuration: '{ "method": "GET", "headers": {"X-FIGMA-TOKEN": "figd_Ojys5DEHod_9n9-HDLYxd-QfUJahQCH048uNtrOX"} }'
+          configuration: '{ "method": "GET", "headers": {"X-FIGMA-TOKEN": "figd_OMgaTAlW9EVeYnbxgKJfayy_XbN9WPCX4aA57AkV"} }'
           save-name: figma
 
       - name: Commit changes
