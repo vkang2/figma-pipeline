@@ -15,7 +15,7 @@ jobs:
           save-name: figma
 
       - name: Print Figma Data 📦
-        run: ./src/print.ts
+        run: npm run print
 
       - name: Commit changes
         uses: EndBug/add-and-commit@v9
