@@ -4,6 +4,14 @@ jobs:
   refresh-feed:
     runs-on: ubuntu-latest
     steps:
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.16.0'
+
+      - name: Set NPM version
+        run: npm install -g npm@9.5.1
+
       - name: Checkout 🛎
         uses: actions/checkout@v4.0.0
 
