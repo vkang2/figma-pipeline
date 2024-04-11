@@ -4,7 +4,7 @@ const { writeFile } = require("node:fs/promises")
 
 
 async function main() {
-  const file = readFileSync('./figma.json', 'utf-8');
+  const file = readFileSync('fetch-api-data-action/figma.json', 'utf-8');
 
   const conversion = convertFigmaVariablesToCss(JSON.parse(file));
   writeFile('./figma.scss', conversion);
