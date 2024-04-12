@@ -21,7 +21,7 @@ jobs:
       - name: Fetch Figma API Data 📦
         uses: JamesIves/fetch-api-data-action@releases/v2
         with:
-          endpoint: https://api.figma.com/v1/files/8CLewmgJ3zB1lVbazToD9n/variables/local
+          endpoint: https://api.figma.com/v1/files/83pIkYjKkNvmroIO9FQ8OL/variables/local
           configuration: '{ "method": "GET", "headers": {"X-FIGMA-TOKEN": "figd_OMgaTAlW9EVeYnbxgKJfayy_XbN9WPCX4aA57AkV"} }'
           save-name: figma
 

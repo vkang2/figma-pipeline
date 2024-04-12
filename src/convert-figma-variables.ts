@@ -101,14 +101,8 @@ function getValueFromVariable(
   const value = variable.valuesByMode[mode.modeId];
   if (typeof value === "object") {
     if ("type" in value && value.type === "VARIABLE_ALIAS") {
-      console.log(mode);
-
-      const aliasVariable = localVariables[value.id];
-      const aliasVariableName = getCSSVariableName(aliasVariable, mode);
-
-      console.log(aliasVariableName);
-      const aliasedVariableValue = variableValues[aliasVariableName];
-      return aliasedVariableValue;
+      const aliasedVariable = localVariables[value.id]
+      return `$${aliasedVariable.name.replace(/\//g, '.')}`
     } else if ("r" in value) {
       return rgbToHex(value);
     }
