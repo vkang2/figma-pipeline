@@ -1,46 +1,6 @@
 import { GetLocalVariablesResponse, LocalVariable } from "@figma/rest-api-spec";
 import { RGB, RGBA } from "@figma/rest-api-spec";
 
-/**
- * Compares two colors for approximate equality since converting between Figma RGBA objects (from 0 -> 1) and
- * hex colors can result in slight differences.
- */
-export function colorApproximatelyEqual(
-  colorA: RGB | RGBA,
-  colorB: RGB | RGBA
-) {
-  return rgbToHex(colorA) === rgbToHex(colorB);
-}
-
-export function parseColor(color: string): RGB | RGBA {
-  color = color.trim();
-  const hexRegex = /^#([A-Fa-f0-9]{6})([A-Fa-f0-9]{2}){0,1}$/;
-  const hexShorthandRegex = /^#([A-Fa-f0-9]{3})([A-Fa-f0-9]){0,1}$/;
-
-  if (hexRegex.test(color) || hexShorthandRegex.test(color)) {
-    const hexValue = color.substring(1);
-    const expandedHex =
-      hexValue.length === 3 || hexValue.length === 4
-        ? hexValue
-            .split("")
-            .map((char) => char + char)
-            .join("")
-        : hexValue;
-
-    const alphaValue =
-      expandedHex.length === 8 ? expandedHex.slice(6, 8) : undefined;
-
-    return {
-      r: parseInt(expandedHex.slice(0, 2), 16) / 255,
-      g: parseInt(expandedHex.slice(2, 4), 16) / 255,
-      b: parseInt(expandedHex.slice(4, 6), 16) / 255,
-      ...(alphaValue ? { a: parseInt(alphaValue, 16) / 255 } : {}),
-    };
-  } else {
-    throw new Error("Invalid color format");
-  }
-}
-
 export function rgbToHex({ r, g, b, ...rest }: RGB | RGBA) {
   const a = "a" in rest ? rest.a : 1;
 
@@ -53,19 +13,7 @@ export function rgbToHex({ r, g, b, ...rest }: RGB | RGBA) {
   return `#${hex}` + (a !== 1 ? toHex(a) : "");
 }
 
-function tokenTypeFromVariable(variable: LocalVariable) {
-  switch (variable.resolvedType) {
-    case "BOOLEAN":
-      return "boolean";
-    case "COLOR":
-      return "color";
-    case "FLOAT":
-      return "number";
-    case "STRING":
-      return "string";
-  }
-}
-
+/** Returns the name of a variable in CSS format */
 function getCSSVariableName(
   variable: LocalVariable,
   mode: {
@@ -89,20 +37,19 @@ function getCSSVariableName(
   return variableName;
 }
 
+/** Returns the value of a variable in a specific mode */
 function getValueFromVariable(
   variable: LocalVariable,
   mode: {
     modeId: string;
     name: string;
   },
-  localVariables: { [id: string]: LocalVariable },
-  variableValues: { [key: string]: any }
+  valuesById: { [id: string]: string }
 ) {
   const value = variable.valuesByMode[mode.modeId];
   if (typeof value === "object") {
     if ("type" in value && value.type === "VARIABLE_ALIAS") {
-      const aliasedVariable = localVariables[value.id]
-      return `$${aliasedVariable.name.replace(/\//g, '.')}`
+      return `$${valuesById[value.id]}`;
     } else if ("r" in value) {
       return rgbToHex(value);
     }
@@ -120,27 +67,41 @@ export function convertFigmaVariablesToCss(
 ): any {
   const localVariableCollections = figmaInput.meta.variableCollections;
   const localVariables = figmaInput.meta.variables;
-  const variables: string[] = [];
-  const variableValues: { [key: string]: any } = {};
+  const variablesByCollection: { [key: string]: string[] } = {};
+  const valuesById: { [id: string]: string } = {};
 
   Object.values(localVariables).forEach((variable) => {
     const collection = localVariableCollections[variable.variableCollectionId];
 
+    if (!collection) {
+      throw new Error(`Collection not found for variable ${variable.name}`);
+    }
+
+    if (!variablesByCollection[collection.name]) {
+      variablesByCollection[collection.name] = [];
+    }
+
     collection.modes.forEach((mode) => {
       let variableName = getCSSVariableName(variable, mode);
+      valuesById[variable.id] = variableName;
 
-      variableValues[variableName] = getValueFromVariable(
-        variable,
-        mode,
-        localVariables,
-        variableValues
+      const variableValue = getValueFromVariable(variable, mode, valuesById);
+
+      variablesByCollection[collection.name].push(
+        `$${variableName}: ${variableValue};\n`
       );
-
-      variables.push(variableName);
     });
   });
 
-  return `// Generated SCSS variables from Figma Variables // \n\n${variables
-    .map((variable) => `$${variable}: ${variableValues[variable]};`)
-    .join("\n")}\n`;
+  let finalOutput = `// Generated SCSS variables from Figma Variables //\n\n`;
+
+  for (const [collection, values] of Object.entries(variablesByCollection)) {
+    finalOutput += `// ${collection} Collection\n`;
+    values.forEach((variable) => {
+      finalOutput += variable;
+    });
+    finalOutput += "\n";
+  }
+
+  return finalOutput;
 }
