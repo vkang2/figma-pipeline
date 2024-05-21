@@ -30,10 +30,7 @@ function getCSSVariableName(
   } else {
     throw new Error(`Unexpected variable name structure: ${variable.name}`);
   }
-  variableName = `${variableName}-${mode.name.replace(
-    " ",
-    "-"
-  )}`.toLocaleLowerCase();
+  variableName = `${variableName.replace(" ", "-")}`;
   return variableName;
 }
 
