@@ -16,10 +16,6 @@ export function rgbToHex({ r, g, b, ...rest }: RGB | RGBA) {
 /** Returns the name of a variable in CSS format */
 function getCSSVariableName(
   variable: LocalVariable,
-  mode: {
-    modeId: string;
-    name: string;
-  }
 ) {
   const variableNameStructure = variable.name.split("/");
   let variableName = variable.name;
@@ -30,7 +26,11 @@ function getCSSVariableName(
   } else {
     throw new Error(`Unexpected variable name structure: ${variable.name}`);
   }
-  variableName = `${variableName.replace(" ", "-")}`;
+  variableName = `${variableName
+    .replace(" ", "-")
+    .replace("(", "-")
+    .replace(")", "")
+    .toLowerCase()}`;
   return variableName;
 }
 
@@ -79,7 +79,7 @@ export function convertFigmaVariablesToCss(
     }
 
     collection.modes.forEach((mode) => {
-      let variableName = getCSSVariableName(variable, mode);
+      let variableName = getCSSVariableName(variable);
       valuesById[variable.id] = variableName;
 
       const variableValue = getValueFromVariable(variable, mode, valuesById);
