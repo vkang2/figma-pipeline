@@ -28,7 +28,7 @@ function getCSSVariableName(
   }
   variableName = `${variableName
     .replace(" ", "-")
-    .replace("(", "-")
+    .replace("(", "")
     .replace(")", "")
     .toLowerCase()}`;
   return variableName;
